@@ -37,7 +37,7 @@ from scenarios import (
 # ==================== メインジェネレータ ====================
 
 class EnhancedLogGenerator:
-    """改善版ログジェネレータ（v3.0）"""
+    """改善版ログジェネレータ"""
     
     def __init__(self, config: GeneratorConfig):
         """
@@ -48,7 +48,7 @@ class EnhancedLogGenerator:
         self.stats = StatisticsCollector()
         
         # 初期化処理
-        logger.info("Initializing Enhanced Log Generator v3.0...")
+        logger.info("Initializing Enhanced Log Generator...")
         initialize_generator(config)
         
         # コンポーネントの初期化
@@ -205,7 +205,7 @@ class EnhancedLogGenerator:
         self.stats.start_timing()
         
         print("\n" + "=" * 70)
-        print(f"🚀 Enhanced Log Generator v3.0")
+        print(f"🚀 Enhanced Log Generator")
         print("=" * 70)
         print(f"Total Events:     {self.config.total_events:,}")
         print(f"Abnormal Ratio:   {self.config.abnormal_ratio:.1%}")

@@ -1,5 +1,5 @@
 """
-Enhanced Log Generator v3.0
+Enhanced Log Generator
 
 機械学習用の高品質な合成ログデータセット生成ツール
 

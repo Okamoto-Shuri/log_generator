@@ -36,10 +36,10 @@ class CLIHelper:
         print("""
 ╔══════════════════════════════════════════════════════════════════╗
 ║                                                                  ║
-║          Enhanced Log Generator v3.0                             ║
+║          Enhanced Log Generator                                    ║
 ║          Synthetic Log Dataset Generator for ML Training         ║
 ║                                                                  ║
-║          Version: 3.0.0                                          ║
+║          Version: 1.0.0                                          ║
 ║          Build: 2025-11-28                                       ║
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -285,7 +285,7 @@ def create_parser() -> argparse.ArgumentParser:
         設定済みのArgumentParser
     """
     parser = argparse.ArgumentParser(
-        description="Enhanced Log Generator v3.0 - Synthetic log dataset generator",
+        description="Enhanced Log Generator - Synthetic log dataset generator",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -296,7 +296,7 @@ Examples:
   %(prog)s generate --events 5000 --seed 42
 
   # Validate a generated dataset
-  %(prog)s validate training_dataset_v3.jsonl
+  %(prog)s validate training_dataset.jsonl
 
   # Show scenario information
   %(prog)s info
@@ -338,7 +338,7 @@ For more information, see the documentation.
     parser_gen.add_argument(
         "--output", "-o",
         type=str,
-        default="training_dataset_v3.jsonl",
+        default="training_dataset.jsonl",
         help="Output JSONL file path"
     )
     

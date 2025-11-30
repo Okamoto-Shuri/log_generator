@@ -66,7 +66,7 @@ python cli.py generate --events 1000 --output my_dataset.jsonl
 python cli.py generate --events 1000 --validate
 
 # 7. データセットの検証のみ
-python cli.py validate training_dataset_v3.jsonl
+python cli.py validate training_dataset.jsonl
 
 # 8. シナリオ情報の表示
 python cli.py info
@@ -90,7 +90,7 @@ python cli.py generate [OPTIONS]
 |-----------|-----------|------|
 | `--events N` | 2000 | 生成するイベント数 |
 | `--abnormal-ratio R` | 0.2 | 異常イベントの比率（0.0〜1.0） |
-| `--output FILE` | training_dataset_v3.jsonl | 出力ファイルパス |
+| `--output FILE` | training_dataset.jsonl | 出力ファイルパス |
 | `--embedding-dim N` | 384 | ベクトルの次元数 |
 | `--batch-size N` | 1000 | バッチ書き込みサイズ |
 | `--start-days-ago N` | 1 | N日前から開始 |
@@ -177,7 +177,7 @@ generator.run()
 from log_generator.core import DatasetValidator
 
 validator = DatasetValidator()
-results = validator.validate_file("training_dataset_v3.jsonl")
+results = validator.validate_file("training_dataset.jsonl")
 
 if results["valid"]:
     print("✅ Dataset is valid!")
@@ -321,7 +321,7 @@ class LogDataset(Dataset):
         return vector, label
 
 # 使用例
-dataset = LogDataset("training_dataset_v3.jsonl")
+dataset = LogDataset("training_dataset.jsonl")
 loader = DataLoader(dataset, batch_size=32, shuffle=True)
 
 for vectors, labels in loader:

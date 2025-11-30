@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Log Generator v3.0 - CLI Entry Point
+Enhanced Log Generator - CLI Entry Point
 
 コマンドラインインターフェースのエントリーポイント
 

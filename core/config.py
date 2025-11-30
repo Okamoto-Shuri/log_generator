@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 # ==================== バージョン情報 ====================
 
-VERSION = "3.0.0"
+VERSION = "1.0.0"
 BUILD_DATE = "2025-11-28"
 
 
@@ -74,7 +74,7 @@ class ScenarioMetadata:
 @dataclass
 class GeneratorConfig:
     """ジェネレータの設定"""
-    output_file: str = "training_dataset_v3.jsonl"
+    output_file: str = "training_dataset.jsonl"
     total_events: int = 2000
     start_time_days_ago: int = 1
     embedding_dim: int = 384
