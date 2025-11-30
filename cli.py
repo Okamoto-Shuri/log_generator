@@ -10,7 +10,7 @@ Enhanced Log Generator v3.0 - CLI Entry Point
     python cli.py info
     
 または:
-    python -m log_generator_v3.cli generate --events 10000
+    python -m log_generator.cli generate --events 10000
 """
 
 import sys

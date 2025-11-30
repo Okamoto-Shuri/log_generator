@@ -5,7 +5,7 @@
 ## 🎯 プロジェクト構成
 
 ```
-log_generator_v3/
+log_generator/
 ├── __init__.py                    # ルートパッケージ初期化
 ├── core/
 │   ├── __init__.py               # coreパッケージ公開API
@@ -41,7 +41,7 @@ log_generator_v3/
 pip install tqdm
 
 # プロジェクトディレクトリに移動
-cd log_generator_v3/
+cd log_generator/
 ```
 
 ### 基本的な使用方法
@@ -131,7 +131,7 @@ python cli.py info
 ### 基本的な使用
 
 ```python
-from log_generator_v3 import GeneratorConfig, EnhancedLogGenerator
+from log_generator import GeneratorConfig, EnhancedLogGenerator
 
 # 設定
 config = GeneratorConfig(
@@ -149,8 +149,8 @@ generator.run()
 ### カスタム設定
 
 ```python
-from log_generator_v3.core import GeneratorConfig
-from log_generator_v3.main_generator import EnhancedLogGenerator
+from log_generator.core import GeneratorConfig
+from log_generator.main_generator import EnhancedLogGenerator
 
 config = GeneratorConfig(
     output_file="custom_dataset.jsonl",
@@ -174,7 +174,7 @@ generator.run()
 ### データセット検証
 
 ```python
-from log_generator_v3.core import DatasetValidator
+from log_generator.core import DatasetValidator
 
 validator = DatasetValidator()
 results = validator.validate_file("training_dataset_v3.jsonl")
@@ -357,7 +357,7 @@ python cli.py generate --events 100000 --batch-size 500
 プロジェクトのルートディレクトリで実行してください：
 
 ```bash
-cd log_generator_v3/
+cd log_generator/
 python cli.py generate
 ```
 

@@ -8,8 +8,8 @@ Enhanced Log Generator v3.0
     python cli.py generate --events 10000
     
     # Pythonコードから
-    from log_generator_v3.core import GeneratorConfig
-    from log_generator_v3.main_generator import EnhancedLogGenerator
+    from log_generator.core import GeneratorConfig
+    from log_generator.main_generator import EnhancedLogGenerator
     
     config = GeneratorConfig(total_events=1000)
     generator = EnhancedLogGenerator(config)
