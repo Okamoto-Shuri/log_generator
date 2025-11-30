@@ -367,8 +367,3 @@ python cli.py generate
 
 MIT License
 
----
-
-## 🎉 完成！
-
-これで完全版のEnhanced Log Generator v3.0が使用可能になりました。
