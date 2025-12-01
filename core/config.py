@@ -8,7 +8,7 @@ import logging
 import sys
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Protocol
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -438,6 +438,25 @@ def _initialize_category_vectors(dim: int = 384) -> None:
         CATEGORY_VECTOR_OFFSETS[cat] = vector
     
     logger.info(f"Initialized category vectors with dimension={dim}, strength={base_strength}")
+
+
+# ==================== 依存性の逆転: Protocol定義 ====================
+
+class HostStateManagerProtocol(Protocol):
+    """ホスト状態管理のプロトコル（依存性の逆転）"""
+    
+    def get_state(self, host: str) -> Dict[str, float]:
+        """ホストの現在状態を取得"""
+        ...
+    
+    def update_state(
+        self, 
+        host: str, 
+        target_state: Dict[str, float],
+        immediate: bool = False
+    ) -> Dict[str, float]:
+        """ホストの状態を更新"""
+        ...
 
 
 # ==================== ユーティリティクラス ====================

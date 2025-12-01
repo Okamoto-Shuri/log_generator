@@ -10,7 +10,7 @@ import uuid
 import math
 import ipaddress
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Protocol
+from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
 
 # core.configからのインポート
@@ -20,7 +20,8 @@ from .config import (
     CATEGORY_VECTOR_OFFSETS,
     USER_AGENTS,
     TRAFFIC_PATTERNS,
-    get_config
+    get_config,
+    HostStateManagerProtocol
 )
 
 
@@ -110,25 +111,6 @@ class SemanticVectorGenerator:
             return 0.0
         
         return dot_product / (norm1 * norm2)
-
-
-# ==================== 依存性の逆転: Protocol定義 ====================
-
-class HostStateManagerProtocol(Protocol):
-    """ホスト状態管理のプロトコル（依存性の逆転）"""
-    
-    def get_state(self, host: str) -> Dict[str, float]:
-        """ホストの現在状態を取得"""
-        ...
-    
-    def update_state(
-        self, 
-        host: str, 
-        target_state: Dict[str, float],
-        immediate: bool = False
-    ) -> Dict[str, float]:
-        """ホストの状態を更新"""
-        ...
 
 
 # ==================== メトリクス生成 ====================
