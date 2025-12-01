@@ -1,0 +1,121 @@
+# Log Generator Configuration File
+# 設定ファイルまたは環境変数で値を上書き可能
+
+# セマンティックベクトル生成設定
+semantic_vector:
+  # 重大度ごとのスケール係数
+  severity_scales:
+    info: 0.3
+    warning: 0.6
+    error: 1.0
+    critical: 1.5
+    fatal: 2.0
+  # ノイズの標準偏差（小さいほど明確な分離）
+  noise_std: 0.05
+  # カテゴリベクトル初期化設定
+  category_vector:
+    segment_size: 100
+    base_strength: 0.8
+
+# メトリクス生成設定
+metrics:
+  # カテゴリごとのメトリクス目標値 (min, max)
+  targets:
+    normal:
+      cpu_usage: [10, 60]
+      memory_usage: [20, 70]
+      response_time_ms: [5, 50]
+      disk_usage: [30, 70]
+      network_latency_ms: [5, 20]
+    resource_memory:
+      cpu_usage: [40, 80]
+      memory_usage: [85, 100]
+      response_time_ms: [100, 500]
+      disk_usage: [30, 70]
+      network_latency_ms: [10, 30]
+    resource_disk:
+      cpu_usage: [10, 40]
+      memory_usage: [30, 70]
+      response_time_ms: [200, 1000]
+      disk_usage: [95, 100]
+      network_latency_ms: [10, 30]
+    resource_cpu:
+      cpu_usage: [85, 100]
+      memory_usage: [40, 80]
+      response_time_ms: [50, 200]
+      disk_usage: [30, 70]
+      network_latency_ms: [10, 30]
+    network:
+      cpu_usage: [5, 30]
+      memory_usage: [20, 60]
+      response_time_ms: [1000, 5000]
+      disk_usage: [30, 70]
+      network_latency_ms: [500, 3000]
+    security:
+      cpu_usage: [80, 100]
+      memory_usage: [60, 90]
+      response_time_ms: [10, 100]
+      disk_usage: [30, 70]
+      network_latency_ms: [5, 50]
+    infrastructure:
+      cpu_usage: [10, 40]
+      memory_usage: [30, 70]
+      response_time_ms: [500, 3000]
+      disk_usage: [30, 70]
+      network_latency_ms: [100, 500]
+    application:
+      cpu_usage: [30, 70]
+      memory_usage: [40, 80]
+      response_time_ms: [100, 500]
+      disk_usage: [30, 70]
+      network_latency_ms: [10, 50]
+    dependency:
+      cpu_usage: [10, 40]
+      memory_usage: [30, 60]
+      response_time_ms: [2000, 6000]
+      disk_usage: [30, 70]
+      network_latency_ms: [1000, 4000]
+    configuration:
+      cpu_usage: [20, 60]
+      memory_usage: [30, 70]
+      response_time_ms: [50, 200]
+      disk_usage: [30, 70]
+      network_latency_ms: [10, 50]
+    middleware:
+      cpu_usage: [30, 70]
+      memory_usage: [50, 90]
+      response_time_ms: [2000, 6000]
+      disk_usage: [30, 70]
+      network_latency_ms: [20, 100]
+
+# ホスト状態管理設定
+host_state:
+  # 状態遷移の平滑化係数 (0=変化なし, 1=即座に変化)
+  smoothing_factor: 0.3
+  # デフォルト状態
+  default_state:
+    cpu_usage: 30.0
+    memory_usage: 40.0
+    response_time_ms: 20.0
+    disk_usage: 50.0
+    network_latency_ms: 10.0
+
+# トラフィックパターン設定（ミリ秒）
+traffic_patterns:
+  peak: [10, 100]          # 平日ピーク時
+  lunch: [100, 400]        # ランチタイム
+  normal: [200, 800]       # 通常時間帯
+  late_night: [2000, 5000] # 深夜
+  weekend: [1000, 5000]    # 週末
+
+# ジェネレータ設定のデフォルト値
+generator:
+  output_file: "training_dataset.jsonl"
+  total_events: 2000
+  start_time_days_ago: 1
+  embedding_dim: 384
+  abnormal_ratio: 0.2
+  batch_size: 1000
+  enable_time_correlation: true
+  enable_host_state: true
+

@@ -19,7 +19,8 @@ from .config import (
     GeneratorConfig,
     CATEGORY_VECTOR_OFFSETS,
     USER_AGENTS,
-    TRAFFIC_PATTERNS
+    TRAFFIC_PATTERNS,
+    get_config
 )
 
 
@@ -28,23 +29,27 @@ from .config import (
 class SemanticVectorGenerator:
     """改善版: より明確なカテゴリ分離を持つベクトル生成"""
     
-    # 重大度ごとのスケール係数（より明確な差）
-    SEVERITY_SCALES = {
-        "info": 0.3,
-        "warning": 0.6,
-        "error": 1.0,
-        "critical": 1.5,
-        "fatal": 2.0
-    }
-    
-    def __init__(self, embedding_dim: int = 384, noise_std: float = 0.05):
+    def __init__(self, embedding_dim: int = 384, noise_std: Optional[float] = None):
         """
         Args:
             embedding_dim: ベクトルの次元数
             noise_std: ノイズの標準偏差（小さいほど明確な分離）
+                      Noneの場合は設定ファイルから読み込む
         """
+        config = get_config()
+        sv_config = config.get("semantic_vector", {})
+        
         self.dim = embedding_dim
-        self.noise_std = noise_std
+        self.noise_std = noise_std if noise_std is not None else sv_config.get("noise_std", 0.05)
+        
+        # 重大度ごとのスケール係数を設定から読み込む
+        self.SEVERITY_SCALES = sv_config.get("severity_scales", {
+            "info": 0.3,
+            "warning": 0.6,
+            "error": 1.0,
+            "critical": 1.5,
+            "fatal": 2.0
+        })
     
     def generate(self, message: str, label: Dict) -> List[float]:
         """
@@ -131,92 +136,37 @@ class HostStateManagerProtocol(Protocol):
 class MetricsGenerator:
     """時系列相関を持つメトリクス生成"""
     
-    # カテゴリごとのメトリクス目標値
-    METRIC_TARGETS = {
-        "normal": {
-            "cpu_usage": (10, 60),
-            "memory_usage": (20, 70),
-            "response_time_ms": (5, 50),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (5, 20)
-        },
-        "resource_memory": {
-            "cpu_usage": (40, 80),
-            "memory_usage": (85, 100),
-            "response_time_ms": (100, 500),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (10, 30)
-        },
-        "resource_disk": {
-            "cpu_usage": (10, 40),
-            "memory_usage": (30, 70),
-            "response_time_ms": (200, 1000),
-            "disk_usage": (95, 100),
-            "network_latency_ms": (10, 30)
-        },
-        "resource_cpu": {
-            "cpu_usage": (85, 100),
-            "memory_usage": (40, 80),
-            "response_time_ms": (50, 200),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (10, 30)
-        },
-        "network": {
-            "cpu_usage": (5, 30),
-            "memory_usage": (20, 60),
-            "response_time_ms": (1000, 5000),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (500, 3000)
-        },
-        "security": {
-            "cpu_usage": (80, 100),
-            "memory_usage": (60, 90),
-            "response_time_ms": (10, 100),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (5, 50)
-        },
-        "infrastructure": {
-            "cpu_usage": (10, 40),
-            "memory_usage": (30, 70),
-            "response_time_ms": (500, 3000),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (100, 500)
-        },
-        "application": {
-            "cpu_usage": (30, 70),
-            "memory_usage": (40, 80),
-            "response_time_ms": (100, 500),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (10, 50)
-        },
-        "dependency": {
-            "cpu_usage": (10, 40),
-            "memory_usage": (30, 60),
-            "response_time_ms": (2000, 6000),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (1000, 4000)
-        },
-        "configuration": {
-            "cpu_usage": (20, 60),
-            "memory_usage": (30, 70),
-            "response_time_ms": (50, 200),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (10, 50)
-        },
-        "middleware": {
-            "cpu_usage": (30, 70),
-            "memory_usage": (50, 90),
-            "response_time_ms": (2000, 6000),
-            "disk_usage": (30, 70),
-            "network_latency_ms": (20, 100)
-        }
-    }
-    
     def __init__(self, host_state_manager: Optional[HostStateManagerProtocol] = None):
         """
         Args:
             host_state_manager: ホスト状態管理（Protocolに依存、Noneの場合は状態管理なし）
         """
+        config = get_config()
+        metrics_config = config.get("metrics", {})
+        
+        # カテゴリごとのメトリクス目標値を設定から読み込む
+        targets = metrics_config.get("targets", {})
+        
+        # リストをタプルに変換
+        self.METRIC_TARGETS = {}
+        for category, metrics in targets.items():
+            self.METRIC_TARGETS[category] = {
+                k: tuple(v) if isinstance(v, list) else v
+                for k, v in metrics.items()
+            }
+        
+        # デフォルト値が設定ファイルにない場合のフォールバック
+        if not self.METRIC_TARGETS:
+            self.METRIC_TARGETS = {
+                "normal": {
+                    "cpu_usage": (10, 60),
+                    "memory_usage": (20, 70),
+                    "response_time_ms": (5, 50),
+                    "disk_usage": (30, 70),
+                    "network_latency_ms": (5, 20)
+                }
+            }
+        
         self.hsm = host_state_manager
     
     def generate(
@@ -505,7 +455,22 @@ class TimeManager:
         else:
             pattern = "normal"
         
-        min_interval, max_interval = TRAFFIC_PATTERNS[pattern]
+        # 設定から動的に取得（設定変更に対応）
+        config = get_config()
+        patterns_config = config.get("traffic_patterns", {
+            "peak": [10, 100],
+            "lunch": [100, 400],
+            "normal": [200, 800],
+            "late_night": [2000, 5000],
+            "weekend": [1000, 5000]
+        })
+        
+        pattern_value = patterns_config.get(pattern, [200, 800])
+        if isinstance(pattern_value, list):
+            min_interval, max_interval = tuple(pattern_value)
+        else:
+            min_interval, max_interval = pattern_value
+        
         return random.randint(min_interval, max_interval)
     
     def get_current_time(self) -> datetime:

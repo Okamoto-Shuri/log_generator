@@ -6,7 +6,9 @@ Core Configuration Module - Part 1 Integration
 
 import logging
 import sys
-from typing import Dict, List, Optional
+import os
+from pathlib import Path
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -21,11 +23,278 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ==================== YAMLライブラリのインポート ====================
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+    logger.warning("PyYAML is not installed. Config file loading will be disabled. Install with: pip install PyYAML")
+
 
 # ==================== バージョン情報 ====================
 
 VERSION = "1.0.0"
 BUILD_DATE = "2025-11-28"
+
+
+# ==================== 設定ファイル読み込み ====================
+
+class ConfigLoader:
+    """設定ファイルと環境変数から設定を読み込むクラス"""
+    
+    _config_cache: Optional[Dict[str, Any]] = None
+    
+    @classmethod
+    def load_config(cls, config_path: Optional[str] = None) -> Dict[str, Any]:
+        """
+        設定ファイルと環境変数から設定を読み込む
+        
+        Args:
+            config_path: 設定ファイルのパス（Noneの場合はデフォルトパスを検索）
+            
+        Returns:
+            設定辞書
+        """
+        if cls._config_cache is not None:
+            return cls._config_cache
+        
+        # デフォルトの設定
+        default_config = cls._get_default_config()
+        
+        # 設定ファイルから読み込み
+        config_file_path = cls._find_config_file(config_path)
+        if config_file_path and config_file_path.exists():
+            if not YAML_AVAILABLE:
+                logger.warning(f"Config file {config_file_path} found but PyYAML is not installed. Using defaults.")
+            else:
+                try:
+                    with open(config_file_path, 'r', encoding='utf-8') as f:
+                        file_config = yaml.safe_load(f) or {}
+                    # ファイル設定でデフォルトを上書き
+                    cls._merge_config(default_config, file_config)
+                    logger.info(f"Loaded configuration from {config_file_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to load config file {config_file_path}: {e}. Using defaults.")
+        else:
+            logger.info("No config file found. Using default configuration.")
+        
+        # 環境変数で上書き
+        cls._apply_env_overrides(default_config)
+        
+        cls._config_cache = default_config
+        return default_config
+    
+    @classmethod
+    def _get_default_config(cls) -> Dict[str, Any]:
+        """デフォルト設定を返す"""
+        return {
+            "semantic_vector": {
+                "severity_scales": {
+                    "info": 0.3,
+                    "warning": 0.6,
+                    "error": 1.0,
+                    "critical": 1.5,
+                    "fatal": 2.0
+                },
+                "noise_std": 0.05,
+                "category_vector": {
+                    "segment_size": 100,
+                    "base_strength": 0.8
+                }
+            },
+            "metrics": {
+                "targets": {
+                    "normal": {
+                        "cpu_usage": [10, 60],
+                        "memory_usage": [20, 70],
+                        "response_time_ms": [5, 50],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [5, 20]
+                    },
+                    "resource_memory": {
+                        "cpu_usage": [40, 80],
+                        "memory_usage": [85, 100],
+                        "response_time_ms": [100, 500],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [10, 30]
+                    },
+                    "resource_disk": {
+                        "cpu_usage": [10, 40],
+                        "memory_usage": [30, 70],
+                        "response_time_ms": [200, 1000],
+                        "disk_usage": [95, 100],
+                        "network_latency_ms": [10, 30]
+                    },
+                    "resource_cpu": {
+                        "cpu_usage": [85, 100],
+                        "memory_usage": [40, 80],
+                        "response_time_ms": [50, 200],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [10, 30]
+                    },
+                    "network": {
+                        "cpu_usage": [5, 30],
+                        "memory_usage": [20, 60],
+                        "response_time_ms": [1000, 5000],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [500, 3000]
+                    },
+                    "security": {
+                        "cpu_usage": [80, 100],
+                        "memory_usage": [60, 90],
+                        "response_time_ms": [10, 100],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [5, 50]
+                    },
+                    "infrastructure": {
+                        "cpu_usage": [10, 40],
+                        "memory_usage": [30, 70],
+                        "response_time_ms": [500, 3000],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [100, 500]
+                    },
+                    "application": {
+                        "cpu_usage": [30, 70],
+                        "memory_usage": [40, 80],
+                        "response_time_ms": [100, 500],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [10, 50]
+                    },
+                    "dependency": {
+                        "cpu_usage": [10, 40],
+                        "memory_usage": [30, 60],
+                        "response_time_ms": [2000, 6000],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [1000, 4000]
+                    },
+                    "configuration": {
+                        "cpu_usage": [20, 60],
+                        "memory_usage": [30, 70],
+                        "response_time_ms": [50, 200],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [10, 50]
+                    },
+                    "middleware": {
+                        "cpu_usage": [30, 70],
+                        "memory_usage": [50, 90],
+                        "response_time_ms": [2000, 6000],
+                        "disk_usage": [30, 70],
+                        "network_latency_ms": [20, 100]
+                    }
+                }
+            },
+            "host_state": {
+                "smoothing_factor": 0.3,
+                "default_state": {
+                    "cpu_usage": 30.0,
+                    "memory_usage": 40.0,
+                    "response_time_ms": 20.0,
+                    "disk_usage": 50.0,
+                    "network_latency_ms": 10.0
+                }
+            },
+            "traffic_patterns": {
+                "peak": [10, 100],
+                "lunch": [100, 400],
+                "normal": [200, 800],
+                "late_night": [2000, 5000],
+                "weekend": [1000, 5000]
+            },
+            "generator": {
+                "output_file": "training_dataset.jsonl",
+                "total_events": 2000,
+                "start_time_days_ago": 1,
+                "embedding_dim": 384,
+                "abnormal_ratio": 0.2,
+                "batch_size": 1000,
+                "enable_time_correlation": True,
+                "enable_host_state": True
+            }
+        }
+    
+    @classmethod
+    def _find_config_file(cls, config_path: Optional[str] = None) -> Optional[Path]:
+        """設定ファイルのパスを検索"""
+        if config_path:
+            return Path(config_path)
+        
+        # 現在のディレクトリから順に検索
+        current = Path.cwd()
+        for path in [current, current.parent]:
+            config_file = path / "config.yaml"
+            if config_file.exists():
+                return config_file
+        
+        # プロジェクトルートを検索
+        project_root = Path(__file__).parent.parent
+        config_file = project_root / "config.yaml"
+        if config_file.exists():
+            return config_file
+        
+        return None
+    
+    @classmethod
+    def _merge_config(cls, base: Dict[str, Any], override: Dict[str, Any]) -> None:
+        """設定を再帰的にマージ"""
+        for key, value in override.items():
+            if key in base and isinstance(base[key], dict) and isinstance(value, dict):
+                cls._merge_config(base[key], value)
+            else:
+                base[key] = value
+    
+    @classmethod
+    def _apply_env_overrides(cls, config: Dict[str, Any]) -> None:
+        """環境変数で設定を上書き"""
+        # セマンティックベクトル設定
+        if os.getenv("LOG_GEN_SEVERITY_INFO"):
+            config["semantic_vector"]["severity_scales"]["info"] = float(os.getenv("LOG_GEN_SEVERITY_INFO"))
+        if os.getenv("LOG_GEN_SEVERITY_WARNING"):
+            config["semantic_vector"]["severity_scales"]["warning"] = float(os.getenv("LOG_GEN_SEVERITY_WARNING"))
+        if os.getenv("LOG_GEN_SEVERITY_ERROR"):
+            config["semantic_vector"]["severity_scales"]["error"] = float(os.getenv("LOG_GEN_SEVERITY_ERROR"))
+        if os.getenv("LOG_GEN_SEVERITY_CRITICAL"):
+            config["semantic_vector"]["severity_scales"]["critical"] = float(os.getenv("LOG_GEN_SEVERITY_CRITICAL"))
+        if os.getenv("LOG_GEN_SEVERITY_FATAL"):
+            config["semantic_vector"]["severity_scales"]["fatal"] = float(os.getenv("LOG_GEN_SEVERITY_FATAL"))
+        if os.getenv("LOG_GEN_NOISE_STD"):
+            config["semantic_vector"]["noise_std"] = float(os.getenv("LOG_GEN_NOISE_STD"))
+        
+        # ホスト状態設定
+        if os.getenv("LOG_GEN_SMOOTHING_FACTOR"):
+            config["host_state"]["smoothing_factor"] = float(os.getenv("LOG_GEN_SMOOTHING_FACTOR"))
+        
+        # ジェネレータ設定
+        if os.getenv("LOG_GEN_OUTPUT_FILE"):
+            config["generator"]["output_file"] = os.getenv("LOG_GEN_OUTPUT_FILE")
+        if os.getenv("LOG_GEN_TOTAL_EVENTS"):
+            config["generator"]["total_events"] = int(os.getenv("LOG_GEN_TOTAL_EVENTS"))
+        if os.getenv("LOG_GEN_EMBEDDING_DIM"):
+            config["generator"]["embedding_dim"] = int(os.getenv("LOG_GEN_EMBEDDING_DIM"))
+        if os.getenv("LOG_GEN_ABNORMAL_RATIO"):
+            config["generator"]["abnormal_ratio"] = float(os.getenv("LOG_GEN_ABNORMAL_RATIO"))
+    
+    @classmethod
+    def reset_cache(cls) -> None:
+        """設定キャッシュをリセット（テスト用）"""
+        cls._config_cache = None
+
+
+# グローバル設定インスタンス
+_app_config = ConfigLoader.load_config()
+
+
+def get_config() -> Dict[str, Any]:
+    """設定を取得"""
+    return _app_config
+
+
+def reload_config(config_path: Optional[str] = None) -> None:
+    """設定を再読み込み"""
+    ConfigLoader.reset_cache()
+    global _app_config
+    _app_config = ConfigLoader.load_config(config_path)
 
 
 # ==================== 列挙型 ====================
@@ -144,9 +413,12 @@ def _initialize_category_vectors(dim: int = 384) -> None:
     """カテゴリベクトルを初期化（遅延初期化）"""
     global CATEGORY_VECTOR_OFFSETS
     
-    # 各カテゴリに100次元を割り当て（より明確な分離）
-    segment_size = 100
-    base_strength = 0.8  # 信号強度を上げる
+    config = get_config()
+    cv_config = config.get("semantic_vector", {}).get("category_vector", {})
+    
+    # 設定から値を取得（デフォルト値あり）
+    segment_size = cv_config.get("segment_size", 100)
+    base_strength = cv_config.get("base_strength", 0.8)
     
     categories = [
         "normal", "resource", "network", "security", 
@@ -218,20 +490,24 @@ class WeightNormalizer:
 class HostStateManager:
     """ホストの状態を管理するクラス（時系列相関用）"""
     
-    def __init__(self, smoothing_factor: float = 0.3):
+    def __init__(self, smoothing_factor: Optional[float] = None):
         """
         Args:
             smoothing_factor: 状態遷移の平滑化係数 (0=変化なし, 1=即座に変化)
+                            Noneの場合は設定ファイルから読み込む
         """
+        config = get_config()
+        hs_config = config.get("host_state", {})
+        
         self.states: Dict[str, Dict[str, float]] = {}
-        self.alpha = smoothing_factor
-        self._default_state = {
+        self.alpha = smoothing_factor if smoothing_factor is not None else hs_config.get("smoothing_factor", 0.3)
+        self._default_state = hs_config.get("default_state", {
             "cpu_usage": 30.0,
             "memory_usage": 40.0,
             "response_time_ms": 20.0,
             "disk_usage": 50.0,
             "network_latency_ms": 10.0
-        }
+        }).copy()
     
     def get_state(self, host: str) -> Dict[str, float]:
         """ホストの現在状態を取得"""
@@ -291,13 +567,22 @@ USER_AGENTS = [
 ]
 
 # 時間帯別のトラフィックパターン（ミリ秒）
-TRAFFIC_PATTERNS = {
-    "peak": (10, 100),          # 平日ピーク時
-    "lunch": (100, 400),        # ランチタイム
-    "normal": (200, 800),       # 通常時間帯
-    "late_night": (2000, 5000), # 深夜
-    "weekend": (1000, 5000),    # 週末
-}
+def _get_traffic_patterns() -> Dict[str, tuple]:
+    """トラフィックパターンを設定から取得"""
+    config = get_config()
+    patterns = config.get("traffic_patterns", {
+        "peak": [10, 100],
+        "lunch": [100, 400],
+        "normal": [200, 800],
+        "late_night": [2000, 5000],
+        "weekend": [1000, 5000]
+    })
+    
+    # リストをタプルに変換
+    return {k: tuple(v) if isinstance(v, list) else v for k, v in patterns.items()}
+
+
+TRAFFIC_PATTERNS = _get_traffic_patterns()
 
 
 # ==================== 初期化 ====================

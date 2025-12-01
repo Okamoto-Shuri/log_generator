@@ -20,7 +20,9 @@ from .config import (
     USER_AGENTS,
     TRAFFIC_PATTERNS,
     initialize_generator,
-    _initialize_category_vectors
+    _initialize_category_vectors,
+    get_config,
+    reload_config
 )
 
 # generators.pyからのエクスポート
@@ -57,6 +59,8 @@ __all__ = [
     'TRAFFIC_PATTERNS',
     'initialize_generator',
     '_initialize_category_vectors',
+    'get_config',
+    'reload_config',
     
     # generators
     'HostStateManagerProtocol',
