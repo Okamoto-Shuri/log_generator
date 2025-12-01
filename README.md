@@ -9,19 +9,22 @@ log_generator/
 ├── __init__.py                    # ルートパッケージ初期化
 ├── core/
 │   ├── __init__.py               # coreパッケージ公開API
-│   ├── config.py                 # 設定クラス、メタデータ（Part 1）
-│   ├── generators.py             # ベクトル/メトリクス生成（Part 2）
-│   └── statistics.py             # 統計収集・検証（Part 3-3）
+│   ├── config.py                 # 設定クラス、メタデータ
+│   ├── protocols.py              # Protocol抽象層（依存性の逆転）
+│   ├── host_state.py             # ホスト状態管理実装
+│   ├── generators.py             # ベクトル/メトリクス生成
+│   └── statistics.py             # 統計収集・検証
 ├── scenarios/
 │   ├── __init__.py               # scenariosパッケージ公開API
-│   ├── base.py                   # シナリオ基底クラス（Part 3-1）
-│   ├── scenarios_a_j.py          # シナリオA〜J（Part 3-1）
-│   └── scenarios_k_u.py          # シナリオK〜U（Part 3-2）
+│   ├── base.py                   # シナリオ基底クラス
+│   ├── scenarios_a_j.py          # シナリオA〜J
+│   └── scenarios_k_u.py          # シナリオK〜U
 ├── cli/
 │   ├── __init__.py               # cliパッケージ公開API
-│   └── commands.py               # CLIコマンド実装（Part 3-4a）
-├── main_generator.py             # メインジェネレータ（Part 3-3）
+│   └── commands.py               # CLIコマンド実装
+├── main_generator.py             # メインジェネレータ
 ├── cli.py                        # エントリーポイント
+├── config.yaml                   # 設定ファイル（オプション）
 └── README.md                     # このファイル
 ```
 
@@ -33,12 +36,13 @@ log_generator/
 
 - Python 3.8以上
 - （オプション）tqdm（プログレスバー用）
+- （オプション）PyYAML（設定ファイル読み込み用）
 
 ### インストール
 
 ```bash
-# tqdmのインストール（推奨）
-pip install tqdm
+# オプション依存パッケージのインストール（推奨）
+pip install tqdm pyyaml
 
 # プロジェクトディレクトリに移動
 cd log_generator/
@@ -71,6 +75,53 @@ python cli.py validate training_dataset.jsonl
 # 8. シナリオ情報の表示
 python cli.py info
 ```
+
+---
+
+## ⚙️ 設定ファイル
+
+`config.yaml`を使用して、デフォルトの動作をカスタマイズできます。設定ファイルはプロジェクトルートに配置し、以下の設定を変更可能です：
+
+### 設定可能な項目
+
+- **セマンティックベクトル生成**: ノイズレベル、重大度スケール、カテゴリベクトル強度
+- **メトリクス生成**: カテゴリごとのメトリクス目標値（CPU、メモリ、レスポンスタイムなど）
+- **ホスト状態管理**: 状態遷移の平滑化係数、デフォルト状態
+- **トラフィックパターン**: 時間帯ごとのイベント間隔設定
+- **ジェネレータ設定**: デフォルトのイベント数、異常率、バッチサイズなど
+
+### 設定ファイルの例
+
+```yaml
+# config.yaml
+semantic_vector:
+  noise_std: 0.05
+  severity_scales:
+    info: 0.3
+    warning: 0.6
+    error: 1.0
+    critical: 1.5
+    fatal: 2.0
+
+metrics:
+  targets:
+    normal:
+      cpu_usage: [10, 60]
+      memory_usage: [20, 70]
+      response_time_ms: [5, 50]
+
+host_state:
+  smoothing_factor: 0.3
+  default_state:
+    cpu_usage: 30.0
+    memory_usage: 40.0
+```
+
+設定ファイルは自動的に検出されます。PyYAMLがインストールされていない場合、デフォルト設定が使用されます（警告が表示されます）。
+
+### 環境変数での設定
+
+一部の設定は環境変数でも上書きできます。詳細は`core/config.py`を参照してください。
 
 ---
 
@@ -360,6 +411,16 @@ python cli.py generate --events 100000 --batch-size 500
 cd log_generator/
 python cli.py generate
 ```
+
+### Q: 設定ファイルが読み込まれない
+
+PyYAMLがインストールされていることを確認してください：
+
+```bash
+pip install pyyaml
+```
+
+設定ファイル（`config.yaml`）はプロジェクトルートに配置してください。設定ファイルが見つからない場合は、デフォルト設定が使用されます。
 
 ---
 
