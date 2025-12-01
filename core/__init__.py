@@ -16,14 +16,22 @@ from .config import (
     SCENARIO_META,
     CATEGORY_VECTOR_OFFSETS,
     WeightNormalizer,
-    HostStateManagerProtocol,
-    HostStateManager,
     USER_AGENTS,
     TRAFFIC_PATTERNS,
     initialize_generator,
     _initialize_category_vectors,
     get_config,
     reload_config
+)
+
+# protocols.pyからのエクスポート（抽象層）
+from .protocols import (
+    HostStateManagerProtocol
+)
+
+# host_state.pyからのエクスポート（具象実装）
+from .host_state import (
+    HostStateManager
 )
 
 # generators.pyからのエクスポート
@@ -54,14 +62,18 @@ __all__ = [
     'SCENARIO_META',
     'CATEGORY_VECTOR_OFFSETS',
     'WeightNormalizer',
-    'HostStateManagerProtocol',
-    'HostStateManager',
     'USER_AGENTS',
     'TRAFFIC_PATTERNS',
     'initialize_generator',
     '_initialize_category_vectors',
     'get_config',
     'reload_config',
+    
+    # protocols (抽象層)
+    'HostStateManagerProtocol',
+    
+    # host_state (具象実装)
+    'HostStateManager',
     
     # generators
     'SemanticVectorGenerator',

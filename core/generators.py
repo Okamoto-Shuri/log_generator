@@ -20,9 +20,11 @@ from .config import (
     CATEGORY_VECTOR_OFFSETS,
     USER_AGENTS,
     TRAFFIC_PATTERNS,
-    get_config,
-    HostStateManagerProtocol
+    get_config
 )
+
+# core.protocolsからのインポート（抽象層のみに依存）
+from .protocols import HostStateManagerProtocol
 
 
 # ==================== セマンティックベクトル生成 ====================
