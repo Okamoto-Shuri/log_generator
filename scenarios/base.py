@@ -6,6 +6,7 @@ Scenario Base Module - Part 3-1 Integration (基底クラス)
 
 from abc import ABC, abstractmethod
 from typing import Dict, List
+from datetime import datetime
 
 # coreパッケージからのインポート
 from core import SCENARIO_META, LogRecord
@@ -44,7 +45,7 @@ class ScenarioGenerator(ABC):
         }
     
     @abstractmethod
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         """
         シナリオに応じたログレコードを生成
         

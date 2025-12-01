@@ -25,6 +25,7 @@ from .config import (
 
 # generators.pyからのエクスポート
 from .generators import (
+    HostStateManagerProtocol,
     SemanticVectorGenerator,
     MetricsGenerator,
     LogFormatter,
@@ -58,6 +59,7 @@ __all__ = [
     '_initialize_category_vectors',
     
     # generators
+    'HostStateManagerProtocol',
     'SemanticVectorGenerator',
     'MetricsGenerator',
     'LogFormatter',

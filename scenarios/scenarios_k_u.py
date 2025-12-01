@@ -7,7 +7,7 @@ Scenarios K-U Module - Part 3-2 Integration
 import uuid
 import random
 from typing import List
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 # coreパッケージからのインポート
 from core import LogRecord, LogRecordFactory, LogFormatter
@@ -25,7 +25,7 @@ from .scenarios_a_j import (
 class ScenarioK(ScenarioGenerator):
     """Config Mismatch (Auth)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -58,7 +58,7 @@ class ScenarioK(ScenarioGenerator):
 class ScenarioL(ScenarioGenerator):
     """DNS Resolution Failure (Network)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -92,7 +92,7 @@ class ScenarioL(ScenarioGenerator):
 class ScenarioM(ScenarioGenerator):
     """DB Deadlock (Application)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         correlation_id = str(uuid.uuid4())
         logs = []
@@ -143,7 +143,7 @@ class ScenarioM(ScenarioGenerator):
 class ScenarioN(ScenarioGenerator):
     """Connection Pool Exhausted (Middleware)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -189,7 +189,7 @@ class ScenarioN(ScenarioGenerator):
 class ScenarioO(ScenarioGenerator):
     """Payload Too Large (Security)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -223,7 +223,7 @@ class ScenarioO(ScenarioGenerator):
 class ScenarioP(ScenarioGenerator):
     """Poison Message (Data Integrity)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -257,7 +257,7 @@ class ScenarioP(ScenarioGenerator):
 class ScenarioQ(ScenarioGenerator):
     """Clock Skew (Configuration)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -295,7 +295,7 @@ class ScenarioQ(ScenarioGenerator):
 class ScenarioR(ScenarioGenerator):
     """File Permission (Configuration)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -333,7 +333,7 @@ class ScenarioR(ScenarioGenerator):
 class ScenarioS(ScenarioGenerator):
     """Noisy Neighbor / I/O Wait (Infrastructure)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         correlation_id = str(uuid.uuid4())
         logs = []
@@ -377,7 +377,7 @@ class ScenarioS(ScenarioGenerator):
 class ScenarioT(ScenarioGenerator):
     """Split Brain (Infrastructure)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         correlation_id = str(uuid.uuid4())
         logs = []
@@ -429,7 +429,7 @@ class ScenarioT(ScenarioGenerator):
 class ScenarioU(ScenarioGenerator):
     """Application Timeout (Application)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()

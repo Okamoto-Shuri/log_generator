@@ -7,6 +7,7 @@ Scenarios A-J Module - Part 3-1 Integration
 import uuid
 import random
 from typing import List
+from datetime import datetime
 
 # coreパッケージからのインポート
 from core import LogRecord, LogRecordFactory, LogFormatter
@@ -28,7 +29,7 @@ class NormalScenarioGenerator:
         self.factory = record_factory
         self.fmt = formatter
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         """正常系のログを生成（複数パターン）"""
         trace_id = str(uuid.uuid4())
         logs = []
@@ -91,7 +92,7 @@ class NormalScenarioGenerator:
 class ScenarioA(ScenarioGenerator):
     """OOM Killer (Resource)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         correlation_id = str(uuid.uuid4())
         logs = []
@@ -138,7 +139,7 @@ class ScenarioA(ScenarioGenerator):
 class ScenarioB(ScenarioGenerator):
     """DB Latency (Network)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -171,7 +172,7 @@ class ScenarioB(ScenarioGenerator):
 class ScenarioC(ScenarioGenerator):
     """DDoS (Security)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -196,7 +197,7 @@ class ScenarioC(ScenarioGenerator):
 class ScenarioD(ScenarioGenerator):
     """Disk Full (Resource)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         correlation_id = str(uuid.uuid4())
         logs = []
@@ -244,7 +245,7 @@ class ScenarioD(ScenarioGenerator):
 class ScenarioE(ScenarioGenerator):
     """External API Down (Dependency)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -277,7 +278,7 @@ class ScenarioE(ScenarioGenerator):
 class ScenarioF(ScenarioGenerator):
     """Logic Bug (Application)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -308,7 +309,7 @@ class ScenarioF(ScenarioGenerator):
 class ScenarioG(ScenarioGenerator):
     """SQL Injection (Security)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -346,7 +347,7 @@ class ScenarioG(ScenarioGenerator):
 class ScenarioH(ScenarioGenerator):
     """Async Worker Fail (Application)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -378,7 +379,7 @@ class ScenarioH(ScenarioGenerator):
 class ScenarioI(ScenarioGenerator):
     """SSL Expired (Configuration)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
@@ -409,7 +410,7 @@ class ScenarioI(ScenarioGenerator):
 class ScenarioJ(ScenarioGenerator):
     """Memory Leak / Slow GC (Resource)"""
     
-    def generate(self, base_time) -> List[LogRecord]:
+    def generate(self, base_time: datetime) -> List[LogRecord]:
         trace_id = str(uuid.uuid4())
         logs = []
         label = self.get_label()
